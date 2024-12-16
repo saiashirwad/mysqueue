@@ -4,6 +4,7 @@
 
 # TODO
 - [ ] Remove dependency on cuid2 (maybe?)
+- [ ] use `SELECT ... FOR UPDATE SKIP LOCKED`
 - [ ] Remove dependency on date-fns (effect/DateTime should be able to handle it)
 - [ ] Remove dependency on kysely (switch to @effect/sql-mysql2)
 - [ ] Set up migrations function that runs whenever the queue starts
