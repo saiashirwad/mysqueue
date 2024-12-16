@@ -15,7 +15,7 @@ export class QueueJob extends Schema.Class<QueueJob>('QueueJob')({
 	attempts: Schema.Number,
 	createdAt: Schema.Date,
 	maxRetries: Schema.Number,
-	scheduledFor: Schema.Date,
+	scheduledFor: Schema.NullOr(Schema.Date),
 	queue: Schema.String,
 	errorMessage: Schema.NullOr(Schema.String),
 }) {}

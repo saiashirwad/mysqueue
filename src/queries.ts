@@ -1,7 +1,6 @@
 import { SqlClient, SqlResolver } from '@effect/sql'
 import { createId } from '@paralleldrive/cuid2'
 import { Effect } from 'effect'
-import * as Schema from 'effect/Schema'
 import { InsertQueueJobSchema } from './schema'
 
 const insertQueueJob = SqlClient.SqlClient.pipe(
@@ -19,3 +18,19 @@ const insertQueueJob = SqlClient.SqlClient.pipe(
 		}),
 	),
 )
+
+const example = Effect.gen(function* () {
+	yield* insertQueueJob.pipe(
+		Effect.flatMap((insert) =>
+			insert.execute({
+				status: 'pending',
+				queue: 'default',
+				payload: JSON.stringify({ hi: 'there' }),
+				attempts: 0,
+				maxRetries: 3,
+				errorMessage: null,
+				scheduledFor: null,
+			}),
+		),
+	)
+})
