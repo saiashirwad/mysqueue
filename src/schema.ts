@@ -1,3 +1,6 @@
+import { SqlClient, SqlResolver } from '@effect/sql'
+import { createId } from '@paralleldrive/cuid2'
+import { Effect } from 'effect'
 import * as Schema from 'effect/Schema'
 
 export class QueueJob extends Schema.Class<QueueJob>('QueueJob')({
@@ -16,3 +19,7 @@ export class QueueJob extends Schema.Class<QueueJob>('QueueJob')({
 	queue: Schema.String,
 	errorMessage: Schema.NullOr(Schema.String),
 }) {}
+
+export const InsertQueueJobSchema = Schema.Struct(QueueJob.fields).pipe(
+	Schema.omit('id', 'createdAt'),
+)
