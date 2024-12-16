@@ -23,7 +23,7 @@ const testQueue = createQueue(
       console.log("Do stuff")
       yield* something
       if (payload.name === "texoport") {
-          return yield* ctx.retry(Duration.seconds(2))
+        return yield* ctx.retry(Duration.seconds(2))
       }
       console.log(payload.name, " complete");
     }),
