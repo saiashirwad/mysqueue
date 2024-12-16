@@ -41,11 +41,12 @@
     "@types/bun": "^1.1.10",
     "typescript": "^5.7.2"
   },
-  "dependencies": { 
-    "@paralleldrive/cuid2": "^2.2.2", 
-    "effect": "^3.11.7", 
-    "kysely": "^0.27.5", 
-    "mysql2": "^3.11.5", 
-    "zod": "^3.24.1" 
+  "dependencies": {
+    "@effect/sql": "^0.23.3",
+    "@effect/sql-mysql2": "^0.24.4",
+    "@paralleldrive/cuid2": "^2.2.2",
+    "effect": "^3.11.7",
+    "mysql2": "^3.11.5",
+    "zod": "^3.24.1"
   }
 }

@@ -1,12 +1,9 @@
-import { UTCDate } from '@date-fns/utc'
 import { createId } from '@paralleldrive/cuid2'
-import { addMilliseconds } from 'date-fns'
-import { Context, Data, Duration, Effect, Schedule, pipe } from 'effect'
+import { Context, Duration, Effect, Schedule, pipe } from 'effect'
 import type { UnknownException } from 'effect/Cause'
-import type { Insertable, Selectable } from 'kysely'
-import { db } from '~/db/db'
-import type { QueueJob } from '~/db/schema'
-import { dbJson } from '~/utils/kysely'
+import { JobQueueError, JobQueueRetry } from './errors'
+import { QueueJob } from './schema'
+import { SqlClient } from '@effect/sql'
 
 type JobQueueOptions = {
 	scheduledFor?: Date
@@ -14,20 +11,8 @@ type JobQueueOptions = {
 	timeoutAfter?: number
 }
 
-export class JobQueueError extends Data.TaggedError('QueueError')<{
-	queue: string
-	jobId: string
-	message: string
-}> {}
-
-export class JobQueueRetry extends Data.TaggedError('QueueRetry')<{
-	queue: string
-	jobId: string
-	duration: Duration.Duration
-}> {}
-
 export type QueueContext = {
-	job: Selectable<QueueJob>
+	job: QueueJob
 	retry: (
 		duration: Duration.Duration,
 	) => Effect.Effect<never, JobQueueError | JobQueueRetry, never>
@@ -36,7 +21,7 @@ export type QueueContext = {
 
 export const QueueContext = Context.GenericTag<QueueContext>('QueueContext')
 
-function createContext(job: Selectable<QueueJob>): QueueContext {
+function createContext(job: QueueJob): QueueContext {
 	const fail = (message: string) =>
 		Effect.fail(new JobQueueError({ queue: job.queue, jobId: job.id, message }))
 
@@ -60,26 +45,30 @@ function createContext(job: Selectable<QueueJob>): QueueContext {
 	}
 }
 
-function fail<E extends Error>(error: E, job: Selectable<QueueJob>) {
-	return Effect.promise(() =>
-		db.transaction().execute(async (tx) => {
-			await tx
-				.updateTable('queueJob')
-				.set({ status: 'failed', errorMessage: error.message })
-				.where('id', '=', job.id)
-				.execute()
-			await tx
-				.insertInto('queueJobExecution')
-				.values({
-					id: createId(),
-					timestamp: new UTCDate(),
-					queueJobId: job.id,
-					payload: dbJson({ error: error.message }),
-					status: 'failed',
-				})
-				.execute()
-		}),
-	).pipe(Effect.flatMap(() => Effect.fail(new Error('Failed'))))
+function fail<E extends Error>(error: E, job: QueueJob) {
+	return Effect.gen(function* () {
+		const sql = yield* SqlClient.SqlClient
+		yield* sql.withTransaction((tx) => Effect.gen(function* () {}))
+	})
+	//return Effect.promise(() =>
+	//	//db.transaction().execute(async (tx) => {
+	//	//	await tx
+	//	//		.updateTable('queueJob')
+	//	//		.set({ status: 'failed', errorMessage: error.message })
+	//	//		.where('id', '=', job.id)
+	//	//		.execute()
+	//	//	await tx
+	//	//		.insertInto('queueJobExecution')
+	//	//		.values({
+	//	//			id: createId(),
+	//	//			timestamp: new UTCDate(),
+	//	//			queueJobId: job.id,
+	//	//			payload: dbJson({ error: error.message }),
+	//	//			status: 'failed',
+	//	//		})
+	//	//		.execute()
+	//	//}),
+	//).pipe(Effect.flatMap(() => Effect.fail(new Error('Failed'))))
 }
 
 function retry(duration: Duration.Duration, job: Selectable<QueueJob>) {
