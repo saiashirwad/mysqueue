@@ -3,7 +3,7 @@
 ```typescript
 import { z } from 'zod'
 import { Duration, Effect } from 'effect'
-import { createQueue, QueueContext } from "@texoport/mysqueue";
+import { createQueue, QueueContext, startWorkers } from "@texoport/mysqueue";
 import * as Schema from '@effect/schema'
 
 const something = Effect.gen(function* () {
@@ -28,6 +28,8 @@ const testQueue = createQueue(
       console.log(payload.name, " complete");
     }),
 );
+
+await startWorkers([testQueue]);
 
 ```
 
