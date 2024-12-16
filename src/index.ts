@@ -4,7 +4,6 @@ import { addMilliseconds } from 'date-fns'
 import { Context, Data, Duration, Effect, Schedule, pipe } from 'effect'
 import type { UnknownException } from 'effect/Cause'
 import type { Insertable, Selectable } from 'kysely'
-import type { z } from 'zod'
 import { db } from '~/db/db'
 import type { QueueJob } from '~/db/schema'
 import { dbJson } from '~/utils/kysely'
@@ -135,9 +134,11 @@ function complete(result: any, job: Selectable<QueueJob>) {
 	)
 }
 
+type Validator<T> = (payload: unknown) => T
+
 interface Queue<T> {
 	name: string
-	schema: z.Schema<T>
+	schema: Validator<T>
 	run: (
 		payload: T,
 	) => Effect.Effect<void, JobQueueError | JobQueueRetry, QueueContext>
@@ -150,7 +151,7 @@ interface Queue<T> {
 
 export function createQueue<T>(
 	name: string,
-	schema: z.Schema<T>,
+	schema: Validator<T>,
 	run: (
 		payload: T,
 	) => Effect.Effect<void, JobQueueError | JobQueueRetry, QueueContext>,
