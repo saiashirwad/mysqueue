@@ -1,0 +1,51 @@
+{
+  "name": "@texoport/mysqueue",
+  "type": "module",
+  "version": "0.0.10",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "description": "A template for typescript + bun libraries",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "bun run build.ts && tsc",
+    "prepublishOnly": "bun run build && bun test",
+    "test": "bun test",
+    "publish:patch": "npm version patch && npm publish --access public",
+    "publish:minor": "npm version minor && npm publish --access public",
+    "publish:major": "npm version major && npm publish --access public",
+    "release:patch": "bun run build && bun test && bun run publish:patch",
+    "release:minor": "bun run build && bun test && bun run publish:minor",
+    "release:major": "bun run build && bun test && bun run publish:major"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "bun"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/saiashirwad/lazy#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/saiashirwad/lazy.git"
+  },
+  "bugs": "https://github.com/saiashirwad/lazy/issues",
+  "author": "Sai Ashirwad <saiashirwadr@gmail.com>",
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/bun": "^1.1.10",
+    "typescript": "^5.7.2"
+  },
+  "dependencies": { 
+    "@paralleldrive/cuid2": "^2.2.2", 
+    "effect": "^3.11.7", 
+    "kysely": "^0.27.5", 
+    "mysql2": "^3.11.5", 
+    "zod": "^3.24.1" 
+  }
+}
